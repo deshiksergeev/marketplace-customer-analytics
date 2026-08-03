@@ -31,6 +31,7 @@ SELECT
 FROM segmentation
 GROUP BY segment
 ORDER BY users_in_segment DESC;
+
 /*
 Key findings:
 The largest customer segment consists of users who placed only one order.
