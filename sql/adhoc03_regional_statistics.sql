@@ -6,6 +6,7 @@ Compare customer and order metrics across regions,
 including average order value, installment usage,
 promo code usage, and customer cancellation rate.
 */
+
 SELECT
     region,
     COUNT(user_id) AS total_users_region,
@@ -29,6 +30,7 @@ SELECT
 FROM ds_ecom.product_user_features
 GROUP BY region
 ORDER BY total_users_region DESC;
+
 /*
 Key findings:
 Moscow has the largest customer base and the highest total number of orders.
