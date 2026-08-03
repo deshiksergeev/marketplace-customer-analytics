@@ -29,3 +29,16 @@ FROM ds_ecom.product_user_features
 WHERE DATE_TRUNC('year', first_order_ts) = '2023-01-01'
 GROUP BY month_of_2023
 ORDER BY month_of_2023;
+
+/*
+Key findings:
+January has the lowest number of customers and orders among the analyzed
+first-order cohorts, while December shows relatively high customer activity
+and one of the highest average order values.
+The share of customers using money transfers remains relatively stable
+across the cohorts.
+The average customer activity duration is relatively low for the December cohort,
+which may indicate a higher share of short-term customers.
+This pattern may be related to seasonal demand around the New Year period
+and requires further investigation.
+*/
