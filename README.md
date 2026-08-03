@@ -1,2 +1,164 @@
-# marketplace-customer-analytics
-SQL-based customer analytics and customer-level feature mart for marketplace data
+# Marketplace Customer Analytics
+
+SQL-based customer analytics project focused on building a customer-level feature mart and solving four ad hoc analytical tasks for an e-commerce marketplace.
+
+## Project Overview
+
+The project consists of two main parts:
+
+1. Building a customer-level feature mart using SQL.
+2. Solving four ad hoc analytical tasks based on the resulting dataset.
+
+The analysis covers customer purchasing behavior, order characteristics, payment methods, regional differences, and customer activity over time.
+
+## Data
+
+The project uses relational e-commerce data containing information about:
+
+- customers;
+- orders;
+- order items;
+- payments;
+- reviews.
+
+The final analytical dataset is built at the `customer × region` level.
+
+The original dataset contains:
+
+- 99,000+ orders;
+- 113,000+ order items;
+- 104,000+ payments;
+- 78,000+ reviews.
+
+## Customer Feature Mart
+
+The customer-level feature mart combines transactional, behavioral, payment, and review information.
+
+`customer_activity_duration` is calculated as the time interval between the customer's first and last recorded order within a region.
+
+The main features include:
+
+- first and last order timestamps;
+- customer activity duration;
+- total number of orders;
+- average order rating;
+- number of orders with ratings;
+- number and share of canceled orders;
+- total order costs;
+- average order value (AOV);
+- number of orders paid in installments;
+- number of orders using promo codes;
+- indicators of money transfer usage;
+- indicators of installment usage;
+- cancellation indicator.
+
+The SQL workflow includes:
+
+- filtering relevant orders;
+- identifying the top three regions by order volume;
+- aggregating customer-level features;
+- correcting inconsistent review scores;
+- calculating order-level costs including delivery;
+- aggregating payment information;
+- handling one-to-many relationships and potential row multiplication after joins;
+- creating binary behavioral features;
+- joining all feature groups into the final customer-level dataset.
+
+## Ad Hoc Analysis
+
+### 1. Customer Segmentation
+
+Customers are segmented by the total number of orders:
+
+- 1 order;
+- 2–5 orders;
+- 6–10 orders;
+- 11+ orders.
+
+For each segment, the analysis calculates:
+
+- number of customers;
+- average number of orders;
+- average order value.
+
+The analysis helps compare purchasing intensity and order economics across customer segments.
+
+### 2. Customer Ranking by AOV
+
+Customers with at least three orders are ranked by average order value.
+
+The analysis returns the top 15 customers with the highest AOV and examines the relationship between purchasing frequency and average order value.
+
+### 3. Regional Analysis
+
+The analysis compares marketplace performance across regions using:
+
+- number of customers;
+- number of orders;
+- average order value;
+- share of orders paid in installments;
+- share of orders using promo codes;
+- share of customers who canceled at least one order.
+
+This analysis helps identify regional differences in customer behavior and payment preferences.
+
+### 4. Customer Activity by First Order Month
+
+Customers whose first order occurred in 2023 are grouped by the month of their first purchase.
+
+For each cohort, the analysis evaluates:
+
+- number of customers;
+- number of orders;
+- average order value;
+- average order rating;
+- share of customers using money transfers;
+- average customer activity duration.
+
+This analysis is used to explore differences in customer behavior across first-order cohorts and identify potential seasonal patterns.
+
+## Key Analytical Findings
+
+- The majority of customers belong to the lowest-frequency purchasing segment, while customers with a high number of orders represent a much smaller share of the customer base.
+- Customers with the highest average order values are predominantly concentrated among users with three orders, indicating that a higher number of orders does not necessarily imply a higher AOV in the analyzed sample.
+- Regional analysis reveals differences in average order value, installment usage, and cancellation behavior across regions.
+- Customer cohorts based on the month of their first order show differences in purchasing activity and customer activity duration, which may indicate seasonal patterns in marketplace behavior.
+
+## SQL Techniques
+
+The project demonstrates practical SQL skills, including:
+
+- Common Table Expressions (CTEs);
+- `JOIN` operations;
+- aggregation and conditional aggregation;
+- window functions;
+- `CASE WHEN` expressions;
+- `FILTER`;
+- `COALESCE`;
+- `GROUP BY` and `HAVING`;
+- ranking with `RANK()`;
+- date and timestamp functions;
+- handling one-to-many relationships;
+- feature engineering at the customer level.
+
+## Repository Structure
+
+```text
+marketplace-customer-analytics/
+│
+├── README.md
+│
+└── sql/
+    ├── customer_feature_mart.sql
+    ├── adhoc01_customer_segmentation.sql
+    ├── adhoc02_customer_aov_ranking.sql
+    ├── adhoc03_regional_analysis.sql
+    └── adhoc04_customer_activity_by_cohort.sql
+```
+
+## Tools
+
+- PostgreSQL
+- SQL
+- DBeaver
+- GitHub
