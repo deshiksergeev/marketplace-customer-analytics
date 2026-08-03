@@ -32,9 +32,13 @@ The original dataset contains:
 
 ## Customer Feature Mart
 
-The customer-level feature mart combines transactional, behavioral, payment, and review information.
+The customer-level feature mart combines transactional, behavioral, payment, and review information at the `customer × region` level.
 
-`customer_activity_duration` is calculated as the time interval between the customer's first and last recorded order within a region.
+`customer_activity_duration` is calculated as the time interval between the customer's first and last recorded order within a region:
+
+`MAX(order_purchase_ts) - MIN(order_purchase_ts)`
+
+This metric represents the **observed customer activity duration in the available data**, rather than a predicted customer lifetime or an estimate of future retention.
 
 The main features include:
 
@@ -45,12 +49,20 @@ The main features include:
 - number of orders with ratings;
 - number and share of canceled orders;
 - total order costs;
-- average order value (AOV);
+- average order cost;
 - number of orders paid in installments;
 - number of orders using promo codes;
 - indicators of money transfer usage;
 - indicators of installment usage;
 - cancellation indicator.
+
+### Note on the Analytical Environment
+
+Due to restrictions of the training environment, the custom feature mart created in `customer_feature_mart.sql` could not be persisted as a new database table for subsequent queries.
+
+Therefore, the four ad hoc analyses are executed against the provided analytical table `ds_ecom.product_user_features`, which was designed to correspond to the feature mart structure required by the assignment.
+
+The SQL implementation in this repository demonstrates the logic used to construct the feature mart, while the ad hoc queries demonstrate how the resulting analytical dataset is used for customer and product analysis.
 
 The SQL workflow includes:
 
@@ -79,15 +91,15 @@ For each segment, the analysis calculates:
 
 - number of customers;
 - average number of orders;
-- average order value.
+- average order cost across non-canceled orders.
 
 The analysis helps compare purchasing intensity and order economics across customer segments.
 
 ### 2. Customer Ranking by AOV
 
-Customers with at least three orders are ranked by average order value.
+Customers with at least three orders are ranked by average order value (AOV), calculated as total order costs divided by the total number of orders.
 
-The analysis returns the top 15 customers with the highest AOV and examines the relationship between purchasing frequency and average order value.
+The analysis returns the top 15 customers with the highest AOV and examines whether customers with a higher number of orders also tend to have a higher average order value.
 
 ### 3. Regional Analysis
 
@@ -158,7 +170,7 @@ marketplace-customer-analytics/
 
 ## Tools
 
-- PostgreSQL
-- SQL
-- DBeaver
-- GitHub
+- PostgreSQL;
+- SQL;
+- DBeaver;
+- GitHub.
