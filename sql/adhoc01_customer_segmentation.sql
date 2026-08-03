@@ -4,7 +4,7 @@ Analysis: Customer segmentation by order frequency
 Description:
 Segment customers based on the total number of orders
 and calculate the number of customers, average order count,
-and average order value for each segment.
+and average order cost across non-canceled orders for each segment.
 */
 
 WITH 
@@ -34,9 +34,14 @@ ORDER BY users_in_segment DESC;
 
 /*
 Key findings:
+
 The largest customer segment consists of users who placed only one order.
 The number of customers decreases as the number of orders per customer increases.
-The only customer in the 11+ orders segment placed 15 orders, but had the lowest
-average order value among the segments.
-Customers with only one order had the highest average order value.
+
+The only customer in the 11+ orders segment placed 15 orders and had
+the lowest average order cost among the analyzed segments.
+
+Customers with only one order had the highest average order cost,
+suggesting that higher purchase frequency is not necessarily associated
+with a higher average order cost in the analyzed sample.
 */
