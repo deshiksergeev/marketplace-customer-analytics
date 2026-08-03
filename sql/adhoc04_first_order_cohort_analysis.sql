@@ -32,13 +32,21 @@ ORDER BY month_of_2023;
 
 /*
 Key findings:
-January has the lowest number of customers and orders among the analyzed
-first-order cohorts, while December shows relatively high customer activity
-and one of the highest average order values.
+
+The January first-order cohort is the smallest by both customer count
+and total number of orders.
+
+The December first-order cohort has a relatively high total number of orders
+and one of the highest average order values among the analyzed cohorts.
+
 The share of customers using money transfers remains relatively stable
-across the cohorts.
+across the first-order cohorts.
+
 The average customer activity duration is relatively low for the December cohort,
-which may indicate a higher share of short-term customers.
-This pattern may be related to seasonal demand around the New Year period
-and requires further investigation.
+which may indicate a higher share of customers with shorter observed activity
+periods in the available data.
+
+The observed differences between first-order cohorts may be related to
+seasonal purchasing patterns around the New Year period and require
+further investigation.
 */
