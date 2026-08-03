@@ -4,8 +4,8 @@ Description: Customer-level feature mart for marketplace data
 Author: Eldar Dzhamaldinov
 Date: 2026-07-17
 
-This query builds a customer-level feature mart based on marketplace
-orders, users, reviews, order items, and payment data.
+This query builds a customer-level analytical feature mart,
+with features aggregated at the user-region level.
 
 The final grain of the mart is:
     one row per user-region pair.
@@ -201,8 +201,9 @@ order_payments_aggregated AS (
 Aggregate monetary and payment-related features at the
 user-region level.
 
-Only delivered orders are included in monetary metrics because
-canceled orders do not represent completed purchases.
+Only delivered orders are included in monetary metrics,
+while canceled orders are excluded from completed-order
+monetary calculations.
 
 COALESCE replaces NULL values produced by LEFT JOINs with zeros
 for binary payment indicators.
@@ -312,4 +313,4 @@ SELECT
 FROM client_base_info cb
 LEFT JOIN orders_info oi USING (user_id, region)
 LEFT JOIN payments_info pi USING (user_id, region)
-LEFT JOIN binary_features bf  USING (user_id, region);
+LEFT JOIN binary_features bf USING (user_id, region);
