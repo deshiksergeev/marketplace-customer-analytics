@@ -64,8 +64,7 @@ client_base_info AS (
         region,
         MIN(order_purchase_ts) AS first_order_ts,
         MAX(order_purchase_ts) AS last_order_ts,
-        MAX(order_purchase_ts) - MIN(order_purchase_ts)
-            AS customer_activity_duration
+        MAX(order_purchase_ts) - MIN(order_purchase_ts) AS customer_activity_duration
     FROM users_orders_region_filtered
     GROUP BY
         user_id,
@@ -119,11 +118,9 @@ orders_info AS (
                 FILTER (
                     WHERE order_status = 'Отменено'
                 )
-        ) / COUNT(DISTINCT order_id)::NUMERIC
-            AS canceled_orders_ratio
+        ) / COUNT(DISTINCT order_id)::NUMERIC AS canceled_orders_ratio
     FROM users_orders_region_filtered
-    LEFT JOIN order_reviews_aggregated ora
-        USING (order_id)
+    LEFT JOIN order_reviews_aggregated ora USING (order_id)
     GROUP BY
         user_id,
         region
@@ -174,7 +171,6 @@ Create order-level binary payment features:
 order_payments_aggregated AS (
     SELECT
         order_id,
-
         MAX(
             CASE
                 WHEN payment_installments > 1
@@ -182,7 +178,6 @@ order_payments_aggregated AS (
                 ELSE 0
             END
         ) AS has_installments,
-
         MAX(
             CASE
                 WHEN payment_type = 'промокод'
@@ -190,7 +185,6 @@ order_payments_aggregated AS (
                 ELSE 0
             END
         ) AS has_promo,
-
         MAX(
             CASE
                 WHEN true_order = 1
@@ -202,7 +196,6 @@ order_payments_aggregated AS (
     FROM order_payments_with_true_order
     GROUP BY order_id
 ),
-
 
 /*
 Aggregate monetary and payment-related features at the
@@ -218,12 +211,10 @@ payments_info AS (
     SELECT
         uorf.user_id,
         uorf.region,
-
         SUM(otp.total_price)
             FILTER (
                 WHERE uorf.order_status = 'Доставлено'
             ) AS total_order_costs,
-
         ROUND(
             AVG(otp.total_price)
                 FILTER (
@@ -231,23 +222,15 @@ payments_info AS (
                 ),
             2
         ) AS avg_order_cost,
-
         SUM(
             COALESCE(opa.has_installments, 0)
         ) AS num_installment_orders,
-
         SUM(
             COALESCE(opa.has_promo, 0)
         ) AS num_orders_with_promo
-
     FROM users_orders_region_filtered uorf
-
-    LEFT JOIN orders_total_price otp
-        USING (order_id)
-
-    LEFT JOIN order_payments_aggregated opa
-        USING (order_id)
-
+    LEFT JOIN orders_total_price otp USING (order_id)
+    LEFT JOIN order_payments_aggregated opa USING (order_id)
     GROUP BY
         uorf.user_id,
         uorf.region
@@ -266,21 +249,18 @@ binary_features AS (
     SELECT
         uorf.user_id,
         uorf.region,
-
         MAX(
             COALESCE(
                 opa.has_money_transfer_first,
                 0
             )
         ) AS used_money_transfer,
-
         MAX(
             COALESCE(
                 opa.has_installments,
                 0
             )
         ) AS used_installments,
-
         MAX(
             CASE
                 WHEN uorf.order_status = 'Отменено'
@@ -288,12 +268,8 @@ binary_features AS (
                 ELSE 0
             END
         ) AS used_cancel
-
     FROM users_orders_region_filtered uorf
-
-    LEFT JOIN order_payments_aggregated opa
-        USING (order_id)
-
+    LEFT JOIN order_payments_aggregated opa USING (order_id)
     GROUP BY
         uorf.user_id,
         uorf.region
@@ -314,7 +290,6 @@ Final grain:
 SELECT
     cb.user_id,
     cb.region,
-
     cb.first_order_ts,
     cb.last_order_ts,
     cb.customer_activity_duration,
@@ -335,12 +310,6 @@ SELECT
     bf.used_cancel
 
 FROM client_base_info cb
-
-LEFT JOIN orders_info oi
-    USING (user_id, region)
-
-LEFT JOIN payments_info pi
-    USING (user_id, region)
-
-LEFT JOIN binary_features bf
-    USING (user_id, region);
+LEFT JOIN orders_info oi USING (user_id, region)
+LEFT JOIN payments_info pi USING (user_id, region)
+LEFT JOIN binary_features bf  USING (user_id, region);
