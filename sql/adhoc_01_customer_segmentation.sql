@@ -1,3 +1,11 @@
+/*
+Project: Marketplace Customer Analytics
+Analysis: Customer segmentation by order frequency
+Description:
+Segment customers based on the total number of orders
+and calculate the number of customers, average order count,
+and average order value for each segment.
+*/
 WITH 
 segmentation AS (
 SELECT
