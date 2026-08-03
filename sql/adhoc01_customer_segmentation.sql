@@ -30,3 +30,11 @@ SELECT
 FROM segmentation
 GROUP BY segment
 ORDER BY users_in_segment DESC;
+/*
+Key findings:
+The largest customer segment consists of users who placed only one order.
+The number of customers decreases as the number of orders per customer increases.
+The only customer in the 11+ orders segment placed 15 orders, but had the lowest
+average order value among the segments.
+Customers with only one order had the highest average order value.
+*/
