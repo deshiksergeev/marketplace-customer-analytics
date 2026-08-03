@@ -23,3 +23,11 @@ GROUP BY user_id
 HAVING SUM(total_orders) >= 3
 ORDER BY aov DESC
 LIMIT 15;
+
+/*
+Key findings:
+The majority of customers in the top 15 by average order value
+placed exactly 3 orders.
+Among customers with at least 3 orders, the highest average order values
+are concentrated among users with a relatively small number of orders.
+*/
