@@ -2,7 +2,7 @@
 Project: Marketplace Customer Analytics
 Analysis: Top customers by average order value (AOV)
 Description:
-Rank customers with at least 3 orders by average order value
+Rank customers with at least 3 orders by average order value (AOV)
 and return the top 15 customers.
 */
 
@@ -26,8 +26,13 @@ LIMIT 15;
 
 /*
 Key findings:
+
 The majority of customers in the top 15 by average order value
 placed exactly 3 orders.
+
 Among customers with at least 3 orders, the highest average order values
 are concentrated among users with a relatively small number of orders.
+
+This suggests that a higher purchase frequency is not necessarily associated
+with a higher average order value in the analyzed customer base.
 */
