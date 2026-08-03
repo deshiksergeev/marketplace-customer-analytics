@@ -163,9 +163,9 @@ marketplace-customer-analytics/
 └── sql/
     ├── customer_feature_mart.sql
     ├── adhoc01_customer_segmentation.sql
-    ├── adhoc02_customer_aov_ranking.sql
-    ├── adhoc03_regional_analysis.sql
-    └── adhoc04_customer_activity_by_cohort.sql
+    ├── adhoc02_top_customers_by_aov.sql
+    ├── adhoc03_regional_statistics.sql
+    └── adhoc04_first_order_cohort_analysis.sql
 ```
 
 ## Tools
