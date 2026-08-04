@@ -26,7 +26,7 @@ SELECT
     ) AS money_transfer_ratio_month,
     AVG(lifetime) AS avg_customer_activity_duration
 FROM ds_ecom.product_user_features
-WHERE DATE_TRUNC('year', first_order_ts) = '2023-01-01'
+WHERE first_order_ts >= '2023-01-01' AND first_order_ts < '2024-01-01'
 GROUP BY month_of_2023
 ORDER BY month_of_2023;
 
@@ -34,19 +34,20 @@ ORDER BY month_of_2023;
 Key findings:
 
 The January first-order cohort is the smallest by both customer count
-and total number of orders.
+and total number of orders, while the November cohort is the largest.
 
-The December first-order cohort has a relatively high total number of orders
-and one of the highest average order values among the analyzed cohorts.
+The September first-order cohort has the highest average order value
+among the analyzed cohorts, followed by the October and November cohorts.
 
 The share of customers using money transfers remains relatively stable
-across the first-order cohorts.
+across the first-order cohorts, ranging from approximately 19% to 22%.
 
-The average customer activity duration is relatively low for the December cohort,
-which may indicate a higher share of customers with shorter observed activity
-periods in the available data.
+The average observed customer activity duration decreases substantially
+for later first-order cohorts. This pattern should be interpreted with caution,
+as customers acquired later in 2023 have a shorter available observation window
+in the dataset.
 
-The observed differences between first-order cohorts may be related to
-seasonal purchasing patterns around the New Year period and require
+The observed differences in cohort size and average order value may reflect
+seasonal variation in customer acquisition and purchasing behavior and require
 further investigation.
 */
