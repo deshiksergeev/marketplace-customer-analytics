@@ -133,7 +133,7 @@ This analysis is used to explore differences in customer behavior across first-o
 
 - The majority of customers belong to the lowest-frequency purchasing segment, while customers with a high number of orders represent a much smaller share of the customer base.
 - Customers with the highest average order values are predominantly concentrated among users with three orders, indicating that a higher number of orders does not necessarily imply a higher AOV in the analyzed sample.
-- Regional analysis reveals differences in average order value, installment usage, and cancellation behavior across regions.
+- Regional analysis shows that Saint Petersburg has the highest average order value and installment usage, while Moscow has the largest customer base and the highest total number of orders. Promo code usage is relatively similar across regions, and cancellation rates remain low.
 - Customer cohorts based on the month of their first order show differences in purchasing activity and customer activity duration, which may indicate seasonal patterns in marketplace behavior.
 
 ## SQL Techniques

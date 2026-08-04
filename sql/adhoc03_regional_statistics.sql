@@ -40,9 +40,8 @@ Saint Petersburg has the highest average order value and the largest share
 of orders paid in installments.
 
 Moscow also has the highest proportion of customers who canceled at least one order,
-which may indicate regional differences in customer behavior and deserves
-further investigation.
+although cancellation rates remain low across all analyzed regions.
 
-The share of orders using promo codes also varies across regions,
-indicating differences in promotional purchasing behavior.
+Promo code usage is relatively similar across the three regions,
+with a slightly higher share in Saint Petersburg.
 */
