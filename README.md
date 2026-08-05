@@ -11,6 +11,32 @@ The project consists of two main parts:
 
 The analysis covers customer purchasing behavior, order characteristics, payment methods, regional differences, and customer activity over time.
 
+The complete exploratory analysis, visualizations, and interpretation of the results are available in:
+
+`analysis/marketplace_analysis.ipynb`
+
+The SQL scripts demonstrate both the construction of the customer feature mart and the analytical queries built on top of it.
+
+## Dashboard Preview
+
+### Customer Segmentation
+
+<p align="center">
+<img src="images/customer_segmentation.png" width="750">
+</p>
+
+### Regional Analysis
+
+<p align="center">
+<img src="images/regional_analysis.png" width="750">
+</p>
+
+### Customer Cohort Analysis
+
+<p align="center">
+<img src="images/customer_cohorts.png" width="750">
+</p>
+
 ## Data
 
 The project uses relational e-commerce data containing information about:
@@ -159,6 +185,16 @@ The project demonstrates practical SQL skills, including:
 marketplace-customer-analytics/
 │
 ├── README.md
+│
+├── analysis/
+│   ├── marketplace_analysis.ipynb
+│   ├── regional_statistics.csv
+│   └── ...
+│
+├── images/
+│   ├── customer_segmentation.png
+│   ├── regional_analysis.png
+│   └── customer_cohorts.png
 │
 └── sql/
     ├── customer_feature_mart.sql
