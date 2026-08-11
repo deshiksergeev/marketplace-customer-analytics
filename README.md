@@ -17,12 +17,72 @@ The complete exploratory analysis, visualizations, and interpretation of the res
 
 The SQL scripts demonstrate both the construction of the customer feature mart and the analytical queries built on top of it.
 
-## Dashboard Preview
+Interactive versions of the charts: [view the notebook on nbviewer](https://nbviewer.org/github/<user>/marketplace-customer-analytics/blob/main/analysis/marketplace_analysis.ipynb)
 
-### Customer Segmentation
+## Key Findings
+
+Every difference below is tested. Average order value is compared with the delta
+method at the customer level; multi-group comparisons are Holm-corrected.
+
+**Moscow's average order value lags both other regions by 11-14%** (3,159 against
+3,612 in Saint Petersburg and 3,506 in Novosibirsk region, p < 1e-11 for both),
+while holding 63% of the customer base. Saint Petersburg and Novosibirsk region
+are indistinguishable from each other (p = 0.12), so the gap worth explaining is
+Moscow's, not Saint Petersburg's lead.
+
+**The one-order segment has a higher mean order value but a lower median than
+repeat buyers** (3,324 vs 3,073 order-weighted, p = 7e-4; 2,165 vs 2,256 median,
+p = 4e-4). Both effects are real and opposite: the top 1% of one-time buyers hold
+10.8% of the segment's revenue, so the mean describes a rare large purchase
+rather than a typical customer.
+
+**Purchase frequency and order value are unrelated** among customers with three
+or more orders (Spearman rho = 0.087, p = 0.28, n = 155). The top-15 ranking by
+order value consists of low-frequency customers purely because of base rates
+(12.4 of 15 expected under a permutation null, 13 observed).
+
+**Order value rose 13% for cohorts acquired from September 2023 onwards**
+(2,844 to 3,214, p = 4e-12), a level shift present in all three regions rather
+than monthly seasonality: all 16 Holm-significant pairwise differences cross the
+August-September boundary.
+
+**The apparent decline in customer retention across 2023 cohorts does not
+exist.** The raw first-to-last-order span falls from 12.8 to 2.2 days only
+because later cohorts are observed for less time. In a fixed 30-day window,
+repeat purchase rates do not differ across cohorts (p = 0.75).
+
+**Review scores fall in Q4 exactly when volume and order value peak** (4.32 in
+August to 4.01 in November, p = 2e-19), and not because review coverage changed
+(stable at 76-79%).
+
+## Recommendations
+
+1. **Investigate Moscow's order value gap before optimizing the other regions.**
+   Moscow holds 63% of customers, so one percentage point of AOV there outweighs
+   the same gain in both other regions combined. Next query: decompose regional
+   AOV into category mix and within-category price using order-item data.
+2. **Stop reporting the mean order value for the one-order segment on its own.**
+   Report the median alongside it, or split the segment by order value band. The
+   single number currently describes a tail, not a customer.
+3. **Replace the raw activity span with repeat purchase in a fixed window in any
+   cohort reporting.** The current metric manufactures a retention decline every
+   month and makes recent acquisition look worse than it is. Exclude cohorts
+   whose window has not closed.
+4. **Test whether the Q4 rating drop is a fulfilment problem.** The joint timing
+   of the volume peak and the satisfaction drop predicts the drop concentrates
+   in late deliveries; `orders` carries both the actual and the estimated
+   delivery date, so this is one query away.
+5. **Do not run experiments on regional or cohort splits without a power check.**
+   Order value has skewness 10.2 and a maximum 87 times the mean, and the
+   smallest region has a third of Moscow's customers.
+
+
+## Visuals
+
+### Customer Base by Region
 
 <p align="center">
-<img src="images/customer_segmentation.png" width="750">
+<img src="images/customer_base_by_region.png" width="750">
 </p>
 
 ### Regional Analysis
@@ -47,7 +107,9 @@ The project uses relational e-commerce data containing information about:
 - payments;
 - reviews.
 
-The final analytical dataset is built at the `customer × region` level.
+The analytical dataset is built at the customer × region grain: 62,408 rows
+covering 62,400 distinct customers (8 customers ordered from more than one
+top-3 region).
 
 The original dataset contains:
 
@@ -56,20 +118,37 @@ The original dataset contains:
 - 104,000+ payments;
 - 78,000+ reviews.
 
+## Method
+
+The environment does not allow persisting the mart as a table, so the ad hoc
+queries run against `ds_ecom.product_user_features`, which has the same
+structure. Its duration column is named `lifetime`; the mart calls the same
+quantity `first_to_last_order_days`, since it is a span between orders and not a
+customer lifetime.
+
+The ad hoc queries return aggregates, which carry no within-group variance and
+cannot support a significance test. `sql/analysis_exports.sql` extracts the same
+population at the customer-region grain; the notebook runs its tests on those
+extracts and uses the aggregate CSVs only to verify that the extracts reproduce
+the queries.
+
 ## Customer Feature Mart
 
 The customer-level feature mart combines transactional, behavioral, payment, and review information at the `customer × region` level.
 
-`customer_activity_duration` is calculated as the time interval between the customer's first and last recorded order within a region:
+`first_to_last_order_days` is the span between a customer's first and last order
+within a region, computed as `MAX(order_purchase_ts)::DATE - MIN(order_purchase_ts)::DATE`.
 
-`MAX(order_purchase_ts) - MIN(order_purchase_ts)`
-
-This metric represents the **observed customer activity duration in the available data**, rather than a predicted customer lifetime or an estimate of future retention.
+It is deliberately not called a lifetime. It is zero by construction for the 97%
+of customers with a single order, so its group average factorizes into the
+repeat rate times the mean span among repeat customers and cannot separate the
+two. It is also censored by the end of the data window. Retention is measured
+instead by repeat purchase within a fixed window.
 
 The main features include:
 
 - first and last order timestamps;
-- customer activity duration;
+- first-to-last order span in days;
 - total number of orders;
 - average order rating;
 - number of orders with ratings;
@@ -81,14 +160,6 @@ The main features include:
 - indicators of money transfer usage;
 - indicators of installment usage;
 - cancellation indicator.
-
-### Note on the Analytical Environment
-
-Due to restrictions of the training environment, the custom feature mart created in `customer_feature_mart.sql` could not be persisted as a new database table for subsequent queries.
-
-Therefore, the four ad hoc analyses are executed against the provided analytical table `ds_ecom.product_user_features`, which was designed to correspond to the feature mart structure required by the assignment.
-
-The SQL implementation in this repository demonstrates the logic used to construct the feature mart, while the ad hoc queries demonstrate how the resulting analytical dataset is used for customer and product analysis.
 
 The SQL workflow includes:
 
@@ -155,29 +226,14 @@ For each cohort, the analysis evaluates:
 
 This analysis is used to explore differences in customer behavior across first-order cohorts and identify potential seasonal patterns.
 
-## Key Analytical Findings
+## Limitations
 
-- The majority of customers belong to the lowest-frequency purchasing segment, while customers with a high number of orders represent a much smaller share of the customer base.
-- Customers with the highest average order values are predominantly concentrated among users with three orders, indicating that a higher number of orders does not necessarily imply a higher AOV in the analyzed sample.
-- Regional analysis shows that Saint Petersburg has the highest average order value and installment usage, while Moscow has the largest customer base and the highest total number of orders. Promo code usage is relatively similar across regions, and cancellation rates remain low.
-- Customer cohorts based on the month of their first order show differences in purchasing activity and customer activity duration, which may indicate seasonal patterns in marketplace behavior.
-
-## SQL Techniques
-
-The project demonstrates practical SQL skills, including:
-
-- Common Table Expressions (CTEs);
-- `JOIN` operations;
-- aggregation and conditional aggregation;
-- window functions;
-- `CASE WHEN` expressions;
-- `FILTER`;
-- `COALESCE`;
-- `GROUP BY` and `HAVING`;
-- ranking with `RANK()`;
-- date and timestamp functions;
-- handling one-to-many relationships;
-- feature engineering at the customer level.
+- 335 customers (0.5%) have every order canceled and therefore no order value.
+- 21% of customer-region records have no review score; ratings are computed over
+  the reviewed subset, whose coverage is stable across cohorts (76-79%).
+- The customer × region grain cannot answer order-level or item-level questions:
+  category mix, delivery times, basket composition.
+- The data has an effective cut-off at 2023-12-31.
 
 ## Repository Structure
 
@@ -188,10 +244,15 @@ marketplace-customer-analytics/
 │
 ├── analysis/
 │   ├── marketplace_analysis.ipynb
+│   ├── customer_features.csv
+│   ├── first_order_cohort_export.csv
+│   ├── customer_segmentation.csv
+│   ├── top_customers_by_aov.csv
 │   ├── regional_statistics.csv
-│   └── ...
+│   └── first_order_cohort_analysis.csv
 │
 ├── images/
+│   ├── customer_base_by_region.png
 │   ├── customer_segmentation.png
 │   ├── regional_analysis.png
 │   └── customer_cohorts.png
@@ -201,12 +262,12 @@ marketplace-customer-analytics/
     ├── adhoc01_customer_segmentation.sql
     ├── adhoc02_top_customers_by_aov.sql
     ├── adhoc03_regional_statistics.sql
-    └── adhoc04_first_order_cohort_analysis.sql
+    ├── adhoc04_first_order_cohort_analysis.sql
+    └── analysis_exports.sql
 ```
 
 ## Tools
 
-- PostgreSQL;
-- SQL;
-- DBeaver;
-- GitHub.
+- PostgreSQL, DBeaver;
+- Python: pandas, NumPy, SciPy, Plotly, kaleido;
+- Jupyter.
