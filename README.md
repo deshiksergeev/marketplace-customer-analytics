@@ -17,7 +17,7 @@ The complete exploratory analysis, visualizations, and interpretation of the res
 
 The SQL scripts demonstrate both the construction of the customer feature mart and the analytical queries built on top of it.
 
-Interactive versions of the charts: [view the notebook on nbviewer](https://nbviewer.org/github/<user>/marketplace-customer-analytics/blob/main/analysis/marketplace_analysis.ipynb)
+Interactive versions of the charts: [view the notebook on nbviewer](https://nbviewer.org/github/deshiksergeev/marketplace-customer-analytics/blob/main/analysis/marketplace_analysis.ipynb)
 
 ## Key Findings
 
@@ -39,12 +39,12 @@ rather than a typical customer.
 **Purchase frequency and order value are unrelated** among customers with three
 or more orders (Spearman rho = 0.087, p = 0.28, n = 155). The top-15 ranking by
 order value consists of low-frequency customers purely because of base rates
-(12.4 of 15 expected under a permutation null, 13 observed).
+(12.5 of 15 expected under a permutation null, 13 observed, P = 0.53).
 
 **Order value rose 13% for cohorts acquired from September 2023 onwards**
 (2,844 to 3,214, p = 4e-12), a level shift present in all three regions rather
-than monthly seasonality: all 16 Holm-significant pairwise differences cross the
-August-September boundary.
+than monthly seasonality: 15 of the 16 Holm-significant pairwise differences
+cross the August-September boundary.
 
 **The apparent decline in customer retention across 2023 cohorts does not
 exist.** The raw first-to-last-order span falls from 12.8 to 2.2 days only
@@ -91,10 +91,22 @@ August to 4.01 in November, p = 2e-19), and not because review coverage changed
 <img src="images/regional_analysis.png" width="750">
 </p>
 
-### Customer Cohort Analysis
+### Order Value by Segment: Mean vs Median
 
 <p align="center">
-<img src="images/customer_cohorts.png" width="750">
+<img src="images/customer_segmentation.png" width="750">
+</p>
+
+### Cohort Order Value with Confidence Intervals
+
+<p align="center">
+<img src="images/cohort_aov.png" width="750">
+</p>
+
+### Retention: Raw Span vs Fixed Window
+
+<p align="center">
+<img src="images/retention_window_comparison.png" width="750">
 </p>
 
 ## Data
@@ -194,7 +206,7 @@ The analysis helps compare purchasing intensity and order economics across custo
 
 ### 2. Customer Ranking by AOV
 
-Customers with at least three orders are ranked by average order value (AOV), calculated as total order costs divided by the total number of orders.
+Customers with at least three orders are ranked by average order value, computed as total delivered cost divided by the number of delivered orders.
 
 The analysis returns the top 15 customers with the highest AOV and examines whether customers with a higher number of orders also tend to have a higher average order value.
 
@@ -222,7 +234,8 @@ For each cohort, the analysis evaluates:
 - average order value;
 - average order rating;
 - share of customers using money transfers;
-- average customer activity duration.
+- mean first-to-last order span;
+- repeat purchase rate within a fixed 30-day window.
 
 This analysis is used to explore differences in customer behavior across first-order cohorts and identify potential seasonal patterns.
 
@@ -255,7 +268,12 @@ marketplace-customer-analytics/
 │   ├── customer_base_by_region.png
 │   ├── customer_segmentation.png
 │   ├── regional_analysis.png
-│   └── customer_cohorts.png
+│   ├── installment_usage_by_region.png
+│   ├── promo_usage_by_region.png
+│   ├── cancellation_rate_by_region.png
+│   ├── customer_cohorts.png
+│   ├── cohort_aov.png
+│   └── retention_window_comparison.png
 │
 └── sql/
     ├── customer_feature_mart.sql
