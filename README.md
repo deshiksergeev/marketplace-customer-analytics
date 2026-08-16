@@ -24,9 +24,9 @@ Interactive versions of the charts: [view the notebook on nbviewer](https://nbvi
 Every difference below is tested. Average order value is compared with the delta
 method at the customer level; multi-group comparisons are Holm-corrected.
 
-**Moscow's average order value lags both other regions by 11-14%** (3,159 against
-3,612 in Saint Petersburg and 3,506 in Novosibirsk region, p < 1e-11 for both),
-while holding 63% of the customer base. Saint Petersburg and Novosibirsk region
+**Average order value in both other regions is 11-14% above Moscow's** (3,612 in
+Saint Petersburg and 3,506 in Novosibirsk region against 3,159 in Moscow,
+p < 1e-11 for both), and Moscow holds 63% of the customer base. Saint Petersburg and Novosibirsk region
 are indistinguishable from each other (p = 0.12), so the gap worth explaining is
 Moscow's, not Saint Petersburg's lead.
 
