@@ -24,12 +24,14 @@ SELECT
         2
     ) AS AOV_region,
 	ROUND(
-        SUM(num_installment_orders) / SUM(total_orders)::NUMERIC,
-        2
+        SUM(num_installment_orders)
+        / NULLIF(SUM(total_orders - num_canceled_orders), 0)::NUMERIC,
+        4
     ) AS installments_ratio,
 	ROUND(
-        SUM(num_orders_with_promo) / SUM(total_orders)::NUMERIC,
-        3
+        SUM(num_orders_with_promo)
+        / NULLIF(SUM(total_orders - num_canceled_orders), 0)::NUMERIC,
+        4
     ) AS promo_ratio,
 	ROUND(
         AVG(used_cancel),

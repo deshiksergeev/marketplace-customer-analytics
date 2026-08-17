@@ -5,10 +5,10 @@ Analysis: Customer activity by first order month
 Groups customers by the month of their first order in 2023 and compares cohort
 size, order value, ratings, payment preference and repeat purchase behaviour.
 
-Cohort comparisons of lifetime are confounded by unequal observation windows:
-the data effectively ends 2023-12-31, so the December cohort is observed for 17
-days on average against 341 for the January cohort. A fixed 30-day window
-removes the confound.
+Cohort comparisons of lifetime are confounded by unequal observation windows: cohorts are
+restricted to first orders in 2023 while orders run to 2024-08-25, so the January cohort
+is observed for 579 days on average against 255 for December. A fixed 30-day window,
+which every 2023 cohort completes, removes the confound.
 
 The mart stores only the first and last order timestamp, so a repeat purchase
 within 30 days is exactly identifiable for customers with exactly two orders
