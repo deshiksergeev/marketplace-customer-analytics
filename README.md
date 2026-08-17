@@ -24,36 +24,45 @@ Interactive versions of the charts: [view the notebook on nbviewer](https://nbvi
 Every difference below is tested. Average order value is compared with the delta
 method at the customer level; multi-group comparisons are Holm-corrected.
 
-**Average order value in both other regions is 11-14% above Moscow's** (3,612 in
-Saint Petersburg and 3,506 in Novosibirsk region against 3,159 in Moscow,
-p < 1e-11 for both), and Moscow holds 63% of the customer base. Saint Petersburg and Novosibirsk region
-are indistinguishable from each other (p = 0.12), so the gap worth explaining is
+**Average order value in both other regions is 11-14% above Moscow's** (Saint Petersburg
++14.3%, 95% CI [+10.9%, +17.9%]; Novosibirsk region +11.0%, CI [+7.9%, +14.2%]; p < 1e-6
+for both), and Moscow holds 63% of the customer base. Saint Petersburg and Novosibirsk region
+are indistinguishable from each other (+3.0%, 95% CI [-0.7%, +6.9%], p = 0.12 — a difference of up to 7% is not ruled out), so the gap worth explaining is
 Moscow's, not Saint Petersburg's lead.
 
-**The one-order segment has a higher mean order value but a lower median than
-repeat buyers** (3,324 vs 3,073 order-weighted, p = 7e-4; 2,165 vs 2,256 median,
-p = 4e-4). Both effects are real and opposite: the top 1% of one-time buyers hold
+**The one-order segment has a higher mean order value but a lower typical one than repeat
+buyers** (3,324 vs 3,073 order-weighted, +8.2%, 95% CI [+3.2%, +13.4%], p = 7e-4). The direction reverses on the typical
+customer: Hodges-Lehmann shift -105, Mann-Whitney p = 4e-4, but the common-language effect
+size is 0.476 against 0.5 under no effect — statistically clear, practically negligible,
+and significant largely because the groups hold 60,117 and 1,942 customers. The reversal is a tail effect: the top 1% of one-time buyers hold
 10.8% of the segment's revenue, so the mean describes a rare large purchase
 rather than a typical customer.
 
 **Purchase frequency and order value are unrelated** among customers with three
-or more orders (Spearman rho = 0.087, p = 0.28, n = 155). The top-15 ranking by
-order value consists of low-frequency customers purely because of base rates
-(12.5 of 15 expected under a permutation null, 13 observed, P = 0.53).
+or more orders (Spearman rho = 0.087, p = 0.28, n = 155). The composition of the top-15 by order value carries no information: 13 of 15 have exactly
+three orders, against 12.5 expected from base rates alone (83.2% of the group has three
+orders), P = 0.53.
 
-**Order value rose 13% for cohorts acquired from September 2023 onwards**
-(2,844 to 3,214, p = 4e-12), a level shift present in all three regions rather
-than monthly seasonality: 15 of the 16 Holm-significant pairwise differences
-cross the August-September boundary.
+**Order value is 13% higher for orders placed from September 2023 onwards** (2,844 to 3,214, +13.0%, 95% CI [+9.5%, +16.6%], p < 1e-6), and the shift holds within each region separately. Since 96.7% of these
+customers ordered exactly once, this is a calendar effect on order value rather than a
+property of the cohorts as acquisition groups. The step pattern is sharp — 15 of the 16
+Holm-significant pairwise differences cross the August-September boundary, against 48% of
+all pairs that cross it — but a single year of data cannot separate a level shift from
+annual seasonality.
 
-**The apparent decline in customer retention across 2023 cohorts does not
-exist.** The raw first-to-last-order span falls from 12.8 to 2.2 days only
-because later cohorts are observed for less time. In a fixed 30-day window,
-repeat purchase rates do not differ across cohorts (p = 0.75).
+**The decline in the raw activity span is a metric artifact, but retention itself is not
+cleanly flat.** The first-to-last-order span falls from 12.8 to 2.2 days across cohorts;
+the metric is zero by construction for 96% of customers and factorizes into repeat rate
+times mean span among repeaters, so it cannot be compared across groups at all. Measured
+as repeat purchase within a fixed 30-day window, cohorts differ at p = 0.061 — driven
+almost entirely by December at 1.00% against a 1.51-2.80% range elsewhere. The test is
+underpowered: with 465 customers in the January cohort it detects only differences of
+2.25 pp or more, against an observed spread of 1.79 pp.
 
-**Review scores fall in Q4 exactly when volume and order value peak** (4.32 in
-August to 4.01 in November, p = 2e-19), and not because review coverage changed
-(stable at 76-79%).
+**Review scores fall in Q4 exactly when volume and order value peak** (4.32 in August to
+4.01 in November, a drop of 0.31 with 95% CI [0.24, 0.37]; the pair was selected as the
+extremes of twelve cohorts, so the p-value is Holm-corrected across all 66 pairs and stays
+below 1e-6), and not because review coverage changed (stable at 76-79%).
 
 ## Recommendations
 
@@ -65,15 +74,15 @@ August to 4.01 in November, p = 2e-19), and not because review coverage changed
    Report the median alongside it, or split the segment by order value band. The
    single number currently describes a tail, not a customer.
 3. **Replace the raw activity span with repeat purchase in a fixed window in any
-   cohort reporting.** The current metric manufactures a retention decline every
-   month and makes recent acquisition look worse than it is. Exclude cohorts
-   whose window has not closed.
+   cohort reporting.** The raw span cannot separate the repeat rate from the span among
+   repeaters, so a change in it does not identify what moved. Exclude cohorts whose
+   window has not closed at the time of reporting.
 4. **Test whether the Q4 rating drop is a fulfilment problem.** The joint timing
    of the volume peak and the satisfaction drop predicts the drop concentrates
    in late deliveries; `orders` carries both the actual and the estimated
    delivery date, so this is one query away.
 5. **Do not run experiments on regional or cohort splits without a power check.**
-   Order value has skewness 10.2 and a maximum 87 times the mean, and the
+   Total spend per customer has skewness 10.2 and a maximum 87 times the mean, and the
    smallest region has a third of Moscow's customers.
 
 
@@ -154,7 +163,7 @@ within a region, computed as `MAX(order_purchase_ts)::DATE - MIN(order_purchase_
 It is deliberately not called a lifetime. It is zero by construction for the 97%
 of customers with a single order, so its group average factorizes into the
 repeat rate times the mean span among repeat customers and cannot separate the
-two. It is also censored by the end of the data window. Retention is measured
+two. It is also bounded by the distance from the first order to the end of the data. Retention is measured
 instead by repeat purchase within a fixed window.
 
 The main features include:
@@ -246,7 +255,9 @@ This analysis is used to explore differences in customer behavior across first-o
   the reviewed subset, whose coverage is stable across cohorts (76-79%).
 - The customer × region grain cannot answer order-level or item-level questions:
   category mix, delivery times, basket composition.
-- The data has an effective cut-off at 2023-12-31.
+- Orders run to 2024-08-25. Cohorts are restricted to customers whose first order falls
+  in 2023, so observation windows range from 579 days for the January cohort to 255 for
+  December — a 2.3x spread, not a censoring cliff.
 
 ## Repository Structure
 
