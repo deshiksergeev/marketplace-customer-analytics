@@ -27,13 +27,13 @@ method at the customer level; multi-group comparisons are Holm-corrected.
 **Average order value in both other regions is 11-14% above Moscow's** (Saint Petersburg
 +14.3%, 95% CI [+10.9%, +17.9%]; Novosibirsk region +11.0%, CI [+7.9%, +14.2%]; p < 1e-6
 for both), and Moscow holds 63% of the customer base. Saint Petersburg and Novosibirsk region
-are indistinguishable from each other (+3.0%, 95% CI [-0.7%, +6.9%], p = 0.12 — a difference of up to 7% is not ruled out), so the gap worth explaining is
+are indistinguishable from each other (+3.0%, 95% CI [-0.7%, +6.9%], p = 0.12, so a difference of up to 7% is not ruled out), so the gap worth explaining is
 Moscow's, not Saint Petersburg's lead.
 
 **The one-order segment has a higher mean order value but a lower typical one than repeat
 buyers** (3,324 vs 3,073 order-weighted, +8.2%, 95% CI [+3.2%, +13.4%], p = 7e-4). The direction reverses on the typical
 customer: Hodges-Lehmann shift -105, Mann-Whitney p = 4e-4, but the common-language effect
-size is 0.476 against 0.5 under no effect — statistically clear, practically negligible,
+size is 0.476 against 0.5 under no effect: statistically clear, practically negligible,
 and significant largely because the groups hold 60,117 and 1,942 customers. The reversal is a tail effect: the top 1% of one-time buyers hold
 10.8% of the segment's revenue, so the mean describes a rare large purchase
 rather than a typical customer.
@@ -45,17 +45,14 @@ orders), P = 0.53.
 
 **Order value is 13% higher for orders placed from September 2023 onwards** (2,844 to 3,214, +13.0%, 95% CI [+9.5%, +16.6%], p < 1e-6), and the shift holds within each region separately. Since 96.7% of these
 customers ordered exactly once, this is a calendar effect on order value rather than a
-property of the cohorts as acquisition groups. The step pattern is sharp — 15 of the 16
-Holm-significant pairwise differences cross the August-September boundary, against 48% of
-all pairs that cross it — but a single year of data cannot separate a level shift from
+property of the cohorts as acquisition groups. The step pattern is sharp (15 of the 16 Holm-significant pairwise differences cross the August-September boundary, against 48% of all pairs that cross it), but a single year of data cannot separate a level shift from
 annual seasonality.
 
 **The decline in the raw activity span is a metric artifact, but retention itself is not
 cleanly flat.** The first-to-last-order span falls from 12.8 to 2.2 days across cohorts;
 the metric is zero by construction for 96% of customers and factorizes into repeat rate
 times mean span among repeaters, so it cannot be compared across groups at all. Measured
-as repeat purchase within a fixed 30-day window, cohorts differ at p = 0.061 — driven
-almost entirely by December at 1.00% against a 1.51-2.80% range elsewhere. The test is
+as repeat purchase within a fixed 30-day window, cohorts differ at p = 0.061, driven almost entirely by December at 1.00% against a 1.51-2.80% range elsewhere. The test is
 underpowered: with 465 customers in the January cohort it detects only differences of
 2.25 pp or more, against an observed spread of 1.79 pp.
 
@@ -143,7 +140,7 @@ The original dataset contains:
 
 The environment does not allow persisting the mart as a table, so the ad hoc
 queries run against `ds_ecom.product_user_features`, which has the same
-structure. Its duration column is named `lifetime`; the mart calls the same
+structure. Its duration column is named `lifetime`. The mart calls the same
 quantity `first_to_last_order_days`, since it is a span between orders and not a
 customer lifetime.
 
@@ -256,8 +253,7 @@ This analysis is used to explore differences in customer behavior across first-o
 - The customer × region grain cannot answer order-level or item-level questions:
   category mix, delivery times, basket composition.
 - Orders run to 2024-08-25. Cohorts are restricted to customers whose first order falls
-  in 2023, so observation windows range from 579 days for the January cohort to 255 for
-  December — a 2.3x spread, not a censoring cliff.
+  in 2023, so observation windows range from 579 days for the January cohort to 255 for December, a 2.3x spread, not a censoring cliff.
 
 ## Repository Structure
 
