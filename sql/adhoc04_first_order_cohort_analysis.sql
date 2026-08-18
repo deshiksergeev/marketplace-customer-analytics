@@ -1,24 +1,9 @@
 /*
-Project: Marketplace Customer Analytics
-Analysis: Customer activity by first order month
+Customer activity by first order month, 2023 cohorts.
 
-Groups customers by the month of their first order in 2023 and compares cohort
-size, order value, ratings, payment preference and repeat purchase behaviour.
-
-Cohort comparisons of lifetime are confounded by unequal observation windows: cohorts are
-restricted to first orders in 2023 while orders run to 2024-08-25, so the January cohort
-is observed for 579 days on average against 255 for December. A fixed 30-day window,
-which every 2023 cohort completes, removes the confound.
-
-The mart stores only the first and last order timestamp, so a repeat purchase
-within 30 days is exactly identifiable for customers with exactly two orders
-(90.7% of all repeat customers) and is a lower bound otherwise. The gap between
-the lower and upper bound is at most 0.6 pp per cohort and does not change the
-conclusion.
-
-Note that lifetime itself is degenerate: it is zero for the 96% of cohort
-customers with a single order, so its average equals the repeat rate times the
-mean span among repeat customers and cannot separate the two.
+Cohorts are restricted to first orders in 2023 while orders continue into 2024, so earlier
+cohorts are observed longer. A fixed 30-day window removes the confound; lifetime itself is
+zero for single-order customers and cannot be compared across cohorts.
 */
 SELECT
 	DATE_TRUNC('month', first_order_ts)::DATE AS month_of_2023,

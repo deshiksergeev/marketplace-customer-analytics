@@ -1,27 +1,20 @@
 /*
-Project: Marketplace Customer Analytics
-Analysis: Customer-level feature mart at the user-region grain
+Customer-level feature mart at the user-region grain.
 
-The mart aggregates order, payment and review behaviour for customers in the
-three highest-volume regions. One row per user-region pair; a customer who
-ordered from two top-3 regions appears twice.
+One row per user-region pair: a customer who ordered from two top-3 regions appears twice.
 
-Terminology worth flagging:
+Careful with the denominator. total_order_costs covers delivered orders only, while
+total_orders counts canceled ones too, so AOV must divide by
+(total_orders - num_canceled_orders). For customers whose orders were all canceled
+total_order_costs is NULL by construction, not missing.
 
-- total_order_costs sums delivered orders only, while total_orders counts both
-  delivered and canceled ones. Any average order value computed from this mart
-  must divide by (total_orders - num_canceled_orders); dividing by total_orders
-  mixes two different order populations.
-- 335 customers (0.5%) have every order canceled, so total_order_costs is NULL
-  for them by construction, not by missing data.
-- Review scores above the 1-5 scale are treated as a data entry artifact and
-  divided by 10.
+Review scores above 5 are treated as a data entry error and divided by 10.
 */
 
 
-/* ============================================================
-   1. Filter orders and users
-   ============================================================ */
+------------ 1. Filter orders and users ----------
+
+-- Top 3 regions are picked dynamically rather than hardcoded by name.
 
 WITH orders_filtered AS (
 	SELECT
@@ -63,18 +56,13 @@ users_orders_region_filtered AS (
 			LIMIT 3
 		)
 ),
-/* ============================================================
-   2. Customer-level behavioral features
-   ============================================================ */
-/*
-Aggregate order activity at the user-region level.
+------------ 2. Customer-level behavioural features ----------
 
-first_to_last_order_days is the span between a customer's first and last order
-in a region, not a customer lifetime: it is zero by construction for the 97% of
-customers with a single order. Its cohort average therefore factorizes into the 
-repeat rate times the mean span among repeat customers and cannot separate the two. 
-It is also bounded above by the distance from the first order to the end of the data window. 
-Retention is measured instead by repeat purchase in a fixed window (adhoc04).
+/*
+first_to_last_order_days is the span between a customer's first and last order, not a
+lifetime. It is zero for single-order customers, so its group average is the repeat rate
+times the mean span among repeat customers and cannot separate the two. Retention is
+measured by repeat purchase in a fixed window instead, see adhoc04.
 */
 client_base_info AS (
 	SELECT
@@ -91,16 +79,9 @@ client_base_info AS (
 		user_id,
 		region
 ),
-/* ============================================================
-   3. Review features
-   ============================================================ */
-/*
-Aggregate reviews at the order level to prevent row multiplication
-when joining review data with order-level information.
+------------ 3. Review features ----------
 
-Some review scores exceed the expected 1-5 scale and are corrected
-by dividing them by 10.
-*/
+-- Reviews are collapsed to the order level first, otherwise the join multiplies rows.
 order_reviews_aggregated AS (
 	SELECT
 		order_id,
@@ -146,13 +127,7 @@ orders_info AS (
 		user_id,
 		region
 ),
-/* ============================================================
-   4. Order value features
-   ============================================================ */
-/*
-Calculate the total value of each order as the sum of item prices
-and delivery costs.
-*/
+------------ 4. Order value features ----------
 orders_total_price AS (
 	SELECT
 		order_id,
@@ -162,13 +137,9 @@ orders_total_price AS (
 	GROUP BY
 		order_id
 ),
-/* ============================================================
-   5. Payment features
-   ============================================================ */
-/*
-Recalculate payment sequence within each order to ensure
-consistent ordering of payment records.
-*/
+------------ 5. Payment features ----------
+
+-- payment_sequential is not guaranteed to be gapless, so the order is recomputed.
 order_payments_with_true_order AS (
 	SELECT
 		*,
@@ -180,12 +151,6 @@ order_payments_with_true_order AS (
 	FROM
 		ds_ecom.order_payments
 ),
-/*
-Create order-level binary payment features:
-- installment payment used;
-- promo code used;
-- money transfer used as the first payment method.
-*/
 order_payments_aggregated AS (
 	SELECT
 		order_id,
@@ -203,6 +168,10 @@ order_payments_aggregated AS (
                 ELSE 0
             END
         ) AS has_promo,
+/*
+Money transfer counts only as the first payment method: the task defines the feature
+that way, and a later transfer in a split payment is a different behaviour.
+*/
 		MAX(
             CASE
                 WHEN true_order = 1
@@ -217,15 +186,8 @@ order_payments_aggregated AS (
 		order_id
 ),
 /*
-Aggregate monetary and payment-related features at the
-user-region level.
-
-Only delivered orders are included in monetary metrics,
-while canceled orders are excluded from completed-order
-monetary calculations.
-
-COALESCE replaces NULL values produced by LEFT JOINs with zeros
-for binary payment indicators.
+Monetary metrics cover delivered orders only, while installment and promo counts cover
+all of them. Any ratio built on these must use a matching denominator.
 */
 payments_info AS (
 	SELECT
@@ -259,13 +221,7 @@ payments_info AS (
 		uorf.user_id,
 		uorf.region
 ),
-/* ============================================================
-   6. Binary customer-level features
-   ============================================================ */
-/*
-Convert order-level payment and cancellation indicators
-into customer-level binary features.
-*/
+------------ 6. Binary customer-level features ----------
 binary_features AS (
 	SELECT
 		uorf.user_id,
@@ -297,16 +253,7 @@ binary_features AS (
 		uorf.user_id,
 		uorf.region
 )
-/* ============================================================
-   7. Final customer feature mart
-   ============================================================ */
-/*
-Combine customer activity, order, payment, and behavioral
-features into a single customer-level analytical dataset.
-
-Final grain:
-    one row per user-region pair.
-*/
+------------ 7. Final mart: one row per user-region pair ----------
 SELECT
 	cb.user_id,
 	cb.region,

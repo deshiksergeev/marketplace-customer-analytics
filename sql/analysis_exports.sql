@@ -1,28 +1,16 @@
 /*
-Project: Marketplace Customer Analytics
-Analysis: Customer-level extracts for the notebook
+Customer-level extracts for the notebook.
 
-The four ad hoc queries return aggregates: three rows by region, twelve by
-cohort. Aggregates carry no within-group variance, so no difference between
-regions or cohorts can be tested from them. These two extracts pull the same
-population at the customer-region grain, which is what the significance tests in
-the notebook consume.
+The ad hoc queries return aggregates, and aggregates have no within-group variance, so
+nothing can be tested on them. These two extracts pull the same population one row per
+customer-region, which is what the tests in the notebook use.
 
-lifetime is an interval in the source table; it is converted to days here so the
-notebook reads a numeric column. Note that it is zero for customers with a
-single order and is not a retention metric - see adhoc04.
+lifetime comes as an interval and is converted to days here. It is zero for single-order
+customers, so it is not a retention metric, see adhoc04.
 */
 
 
--- ============================================================
--- 1. Full customer extract
--- ============================================================
-/*
-Feeds the segmentation, ranking and regional sections. Customers whose orders
-were all canceled are kept: they have no order value by construction, and
-dropping them here would silently change the customer counts reported by
-adhoc01 and adhoc03.
-*/
+-- Feeds the segmentation, ranking and regional sections.
 
 SELECT
 	user_id,
@@ -43,13 +31,7 @@ FROM
 	ds_ecom.product_user_features;
 
 
--- ============================================================
--- 2. 2023 first-order cohort extract
--- ============================================================
-/*
-Feeds the cohort section. The window matches adhoc04 so that the aggregates in
-first_order_cohort_analysis.csv can be reproduced from this file.
-*/
+-- Feeds the cohort section. Same window as adhoc04, so its aggregates reproduce from here.
 
 SELECT
 	user_id,

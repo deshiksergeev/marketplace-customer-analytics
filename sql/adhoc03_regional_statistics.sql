@@ -1,18 +1,10 @@
 /*
-Project: Marketplace Customer Analytics
-Analysis: Regional customer and order statistics
+Regional customer and order statistics.
 
-Compares customer and order metrics across the three top regions: average order
-value, installment usage, promo code usage and customer cancellation rate.
+installments_ratio and promo_ratio are order-weighted, cancel_ratio is customer-weighted -
+the three are not comparable to one another.
 
-The three shares are not normalized the same way: installments_ratio and
-promo_ratio are order-weighted, cancel_ratio is customer-weighted (AVG of a
-customer-level binary flag). They are not comparable to one another.
-
-COUNT(user_id) is correct at this grain: the mart is one row per user-region
-pair, so user_id is unique within a region. Across regions the row count
-(62,408) exceeds the number of distinct customers (62,400) because 8 customers
-ordered from more than one top-3 region.
+COUNT(user_id) without DISTINCT is correct here: the mart is one row per user-region pair.
 */
 SELECT
 	region,

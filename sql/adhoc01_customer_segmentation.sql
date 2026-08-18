@@ -1,15 +1,11 @@
 /*
-Project: Marketplace Customer Analytics
-Analysis: Customer segmentation by order frequency
+Customer segmentation by order frequency.
 
-Segments are computed per customer across regions (GROUP BY user_id), not per
-user-region row: a customer who ordered from two top-3 regions is one customer
-with the combined order count, not two. This differs from adhoc03, which is
-regional by design.
+Grouped by user_id, not by user-region row: a customer who ordered from two top-3 regions
+is one customer with the combined count.
 
-Average order cost divides delivered cost by delivered orders. Canceled orders
-are excluded from the denominator because they contribute nothing to the
-numerator.
+Average order cost divides delivered cost by delivered orders - total_orders includes
+canceled ones, which contribute nothing to the numerator.
 */
 
 WITH 
